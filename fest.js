@@ -1,5 +1,4 @@
 import * as StellarSDK from '@stellar/stellar-sdk';
-
 const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
 // Define the initial network settings and costs
 const initialConfig = {

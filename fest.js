@@ -1,7 +1,7 @@
 import * as StellarSDK from '@stellar/stellar-sdk';
 const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
 // Define the initial network settings and costs
-const initialConfig = {
+const maxConfigAndCost = {
   networkSettings: {
     maxCpuInstructionsPerTxn: 100_000_000,
     maxMemoryLimitPerTxn: 40 * 1024 * 1024, // 40 MB in bytes
@@ -54,7 +54,7 @@ const actualUsage = {
   eventsReturnValueSize: 6 * 1024, // 6 KB in bytes
 };
 
-const resourceFee = calculateResourceFee(actualUsage, initialConfig);
+const resourceFee = calculateResourceFee(actualUsage, maxConfigAndCost);
 
 async function fetchFeeStats() {
   try {

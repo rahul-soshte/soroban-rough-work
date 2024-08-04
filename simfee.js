@@ -11,7 +11,7 @@ function sorobill(sim, tx_xdr) {
   
   const events = sim.result.events.map((e) => {
     const buffer = Buffer.from(e, 'base64');
-    let parsedEvent = StellarSDK.xdr.DiagnosticEvent.fromXDR(buffer, 'base64');
+    let parsedEvent = StellarSDK.xdr.DiagnosticEvent.fromXDR(buffer);
   
     if (parsedEvent.event().type().name !== 'contract')
           return 0;
@@ -86,6 +86,8 @@ const transaction = new StellarSDK.TransactionBuilder(sourceAccount, { fee: Stel
   .build();
 
 const tx_xdr = transaction.toEnvelope().toXDR('base64');
+
+// console.log(tx_xdr);
 
 let requestBody = {
   "jsonrpc": "2.0",

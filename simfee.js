@@ -108,8 +108,12 @@ let res = await fetch("https://soroban-testnet.stellar.org:443", {
 })
 
 let simulateResponse = await res.json();
-console.log(sorobill(simulateResponse, tx_xdr))
-
+let sorocosts = sorobill(simulateResponse, tx_xdr)
+let inclusionFee = await server.getFeeStats();
+inclusionFee = inclusionFee.sorobanInclusionFee.max
+let totalEstimatedFee = sorocosts.resource_fee_in_xlm + inclusionFee
+console.log("Contract Costs ", sorocosts )
+console.log("Total Fees ", totalEstimatedFee)
 
 
 

@@ -33,8 +33,6 @@ function sorobill(sim, tx_xdr) {
   const stroopValue = sorobanTransactionData.resourceFee().toString()
   const xlmValue = Number(stroopValue) * 10**(-7);
 
-  // let rFeeInXLM = xlmValue.toString();
-
   const rwro = [
       sorobanTransactionData.resources().footprint().readWrite()
       .flatMap((rw) => rw.toXDR().length),

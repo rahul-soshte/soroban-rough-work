@@ -1,6 +1,13 @@
 name = "zephyr-fee-agg-imp"
 
 [[tables]]
+name = "lastupdt"
+
+[[tables.columns]]
+name = "last_updt"
+col_type = "BYTEA"
+
+[[tables]]
 name = "avgfee"
 
 [[tables.columns]]

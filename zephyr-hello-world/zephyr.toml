@@ -1,8 +1,0 @@
-name = "zephyr-hello-world"
-
-[[tables]]
-name = "test"
-
-[[tables.columns]]
-name = "hello"
-col_type = "BYTEA"

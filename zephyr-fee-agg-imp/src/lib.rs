@@ -1,13 +1,8 @@
 use zephyr_sdk::{soroban_sdk::xdr::{FeeBumpTransactionInnerTx, Operation, OperationBody, TransactionEnvelope, TransactionResultResult}, Condition, DatabaseDerive, DatabaseInteract, EnvClient};
 use zephyr_sdk::bincode;
 use zephyr_sdk::ZephyrVal;
+use serde::{Deserialize, Serialize};
 
-
-#[derive(DatabaseDerive, Clone)]
-#[with_name("lastupdt")]
-pub struct LastUpdt {
-    pub last_updt: u64
-}
 
 #[derive(DatabaseDerive, Clone)]
 #[with_name("avgfee")]
@@ -17,6 +12,13 @@ pub struct Stats {
     pub contracts: i128,
     pub other: i128,
 }
+
+#[derive(Deserialize)]
+pub struct Request {
+    time_st1: u64,
+    time_st1: u64,
+}
+
 
 // Slightly updated version for precision correctness.
 // Please note that this design is not the most efficient (and it hasn't been thought through much) and can definitely be improved. This
@@ -28,24 +30,7 @@ pub extern "C" fn on_close() {
     let env = EnvClient::new();
     let reader = env.reader();
     let time_st = reader.ledger_timestamp();
-    
-    let last_update = env.read::<LastUpdt>();
 
-    if let Some(row) = last_update.last() {
-        env.log().debug("Check if it 1 day difference", None);
-        
-        let val = is_difference_at_least_one_day(time_st, row.last_updt);
-        if val {
-            env.log().debug("Truthy Condition", None);
-
-        } else {
-            env.log().debug("Falsy Condition", None);
-        }
-
-    } else {
-        env.log().debug("Update when no timestamp", None);
-    }
-     
     let (contract, classic, other, _avg_soroban, _avg_classic) = {
         let mut contract_invocations = 0;
         let mut classic = 0;
@@ -100,11 +85,7 @@ pub extern "C" fn on_close() {
         other
     });
     
-    // Update the last updated time
-    env.put(&LastUpdt {
-        last_updt: time_st,
-    });
-
+    
     env.log().debug("Successfully wrote to the database", None);
 
 }
@@ -137,19 +118,4 @@ fn count_ops_and_fees(ops: Vec<Operation>, txfee: i64, classic: &mut i32, contra
             }
         }
     }
-}
-
-
-fn is_difference_at_least_one_day(timestamp1: u64, timestamp2: u64) -> bool {
-    const SECONDS_IN_A_DAY: u64 = 86400;
-
-    // Calculate the absolute difference in seconds
-    let difference_in_seconds = if timestamp1 > timestamp2 {
-        timestamp1 - timestamp2
-    } else {
-        timestamp2 - timestamp1
-    };
-
-    // Check if the difference is at least one day
-    difference_in_seconds >= SECONDS_IN_A_DAY
 }

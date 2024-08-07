@@ -4,7 +4,7 @@ use zephyr_sdk::ZephyrVal;
 use serde::{Deserialize, Serialize};
 
 
-#[derive(DatabaseDerive, Clone)]
+#[derive(Serialize, DatabaseDerive, Clone)]
 #[with_name("avgfee")]
 pub struct Stats {
     pub time_st: u64,
@@ -13,10 +13,9 @@ pub struct Stats {
     pub other: i128,
 }
 
-#[derive(Deserialize)]
-pub struct Request {
-    time_st1: u64,
-    time_st1: u64,
+#[derive(Serialize, Deserialize)]
+pub struct LastLedgerRequest {
+    lastnl: String,
 }
 
 
@@ -90,6 +89,25 @@ pub extern "C" fn on_close() {
 
 }
 
+//TODO: Get Current Ledger
+//TODO: Calculate the Last 5 ledgers = 25 seconds timeline
+//TODO: Calculate the last 10 ledgers = 50 second timeline
+//TODO: Calculate the last 30 ledgers = 150 seconds timeline
+//TODO: Custom API for ledger filtering
+//TODO: Custom API for timestamp filtering
+
+#[no_mangle]
+pub extern "C" fn get_last() {
+    let env = EnvClient::empty();
+    let request: LastLedgerRequest = env.read_request_body();
+    let ledgers: Vec<Stats> = env.read::<Stats>();
+    let number: usize = request.lastnl.parse().expect("Failed to convert string to usize");
+    env.log().debug("Whats happening here", None);
+    let len = ledgers.len();
+    let last_5 = &ledgers[len.saturating_sub(number)..];
+    env.log().debug("Maybe happening here", None);
+    env.conclude(&last_5)
+}
 
 // helper function
 fn count_ops_and_fees(ops: Vec<Operation>, txfee: i64, classic: &mut i32, contract_invocations: &mut i32, other_soroban: &mut i32, tot_soroban_fee: &mut i64, tot_classic_fee: &mut i64) {

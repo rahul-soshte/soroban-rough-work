@@ -20,9 +20,9 @@ name = "other"
 col_type = "BYTEA"
 
 [[tables.columns]]
-name = "fee_sor"
+name = "avg_s"
 col_type = "BYTEA"
 
 [[tables.columns]]
-name = "fee_clas"
+name = "avg_c"
 col_type = "BYTEA"

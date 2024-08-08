@@ -7,14 +7,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Clone)]
 pub struct StatsResponse {
     pub time_st: u64,
-    pub classic: i64,
-    pub contracts: i64,
-    pub other: i64,
+    // pub classic: i64,
+    // pub contracts: i64,
+    // pub other: i64,
+    pub avg_s: String,
+    pub avg_c: String,
 }
 
 impl From<&Stats> for StatsResponse {
     fn from(value: &Stats) -> Self {
-        Self { time_st: value.time_st, classic: value.classic as i64, contracts: value.contracts as i64, other: value.other as i64 }
+        Self { time_st: value.time_st, avg_s: value.avg_s.to_string(), avg_c: value.avg_c.to_string() }
     }
 }
 
@@ -25,6 +27,9 @@ pub struct Stats {
     pub classic: i128,
     pub contracts: i128,
     pub other: i128,
+    pub avg_s: f64,
+    pub avg_c: f64,
+
 }
 
 #[derive(Serialize, Deserialize)]
@@ -45,7 +50,7 @@ pub extern "C" fn on_close() {
     let reader = env.reader();
     let time_st = reader.ledger_timestamp();
 
-    let (contract, classic, other, _avg_soroban, _avg_classic) = {
+    let (contract, classic, other, avg_soroban, avg_classic) = {
         let mut contract_invocations = 0;
         let mut classic = 0;
         let mut other_soroban = 0;
@@ -88,15 +93,25 @@ pub extern "C" fn on_close() {
             }
         };
 
-        (contract_invocations as i128, classic as i128, other_soroban as i128, tot_soroban_fee as f64 / (contract_invocations) as f64, tot_classic_fee as f64 / (successful_envelopes - contract_invocations) as f64)
+        let avg_soroban: f64 = if contract_invocations > 0 { tot_soroban_fee as f64 / contract_invocations as f64 } else { 0.0 };
+        let avg_classic: f64 = if classic > 0 { tot_classic_fee as f64 / (successful_envelopes - contract_invocations) as f64 } else { 0.0 };
+
+        (contract_invocations as i128, classic as i128, other_soroban as i128, avg_soroban, avg_classic)
     };
+
+    // env.log().debug("Are we coming here", None);
+    env.log().debug(format!("Avg Soroban, Avg Classic {:?} {:?}", avg_soroban, avg_classic), None);
+    // env.log().debug("Are we coming here", avg_soroban.into());
+    // env.log().debug("Are we coming here", avg_classic.into());
 
     // Just insert the fee into it,
     env.put(&Stats {
         time_st,
         classic,
         contracts: contract,
-        other
+        other,
+        avg_s: avg_soroban,
+        avg_c: avg_classic,
     });
     
     
@@ -108,9 +123,10 @@ pub extern "C" fn on_close() {
 //TODO: Calculate the Last 5 ledgers = 25 seconds timeline
 //TODO: Calculate the last 10 ledgers = 50 second timeline
 //TODO: Calculate the last 30 ledgers = 150 seconds timeline
-//TODO: Custom API for ledger filtering
 //TODO: Custom API for timestamp filtering
 
+
+// Ask for data back `n` ledgers
 #[no_mangle]
 pub extern "C" fn get_last() {
     let env = EnvClient::empty();

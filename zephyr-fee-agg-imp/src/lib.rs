@@ -4,6 +4,20 @@ use zephyr_sdk::ZephyrVal;
 use serde::{Deserialize, Serialize};
 
 
+#[derive(Serialize, Clone)]
+pub struct StatsResponse {
+    pub time_st: u64,
+    pub classic: i64,
+    pub contracts: i64,
+    pub other: i64,
+}
+
+impl From<&Stats> for StatsResponse {
+    fn from(value: &Stats) -> Self {
+        Self { time_st: value.time_st, classic: value.classic as i64, contracts: value.contracts as i64, other: value.other as i64 }
+    }
+}
+
 #[derive(Serialize, DatabaseDerive, Clone)]
 #[with_name("avgfee")]
 pub struct Stats {
@@ -15,7 +29,7 @@ pub struct Stats {
 
 #[derive(Serialize, Deserialize)]
 pub struct LastLedgerRequest {
-    lastnl: String,
+    lastnl: u32,
 }
 
 
@@ -27,6 +41,7 @@ pub extern "C" fn on_close() {
 
     // Environment and Reader Initialization:
     let env = EnvClient::new();
+
     let reader = env.reader();
     let time_st = reader.ledger_timestamp();
 
@@ -101,11 +116,9 @@ pub extern "C" fn get_last() {
     let env = EnvClient::empty();
     let request: LastLedgerRequest = env.read_request_body();
     let ledgers: Vec<Stats> = env.read::<Stats>();
-    let number: usize = request.lastnl.parse().expect("Failed to convert string to usize");
-    env.log().debug("Whats happening here", None);
     let len = ledgers.len();
-    let last_5 = &ledgers[len.saturating_sub(number)..];
-    env.log().debug("Maybe happening here", None);
+    let last_5: Vec<StatsResponse> = ledgers[len.saturating_sub(request.lastnl as usize)..].iter().map(|stat| stat.into()).collect();
+    
     env.conclude(&last_5)
 }
 

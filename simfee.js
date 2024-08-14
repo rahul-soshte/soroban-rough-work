@@ -28,9 +28,18 @@ function sorobill(sim, tx_xdr) {
 
 
   const sorobanTransactionData = StellarSDK.xdr.SorobanTransactionData.fromXDR(sim.result.transactionData, 'base64');
+  
+  console.log(sorobanTransactionData);
+  
   const resources = sorobanTransactionData.resources();
 
-  const stroopValue = sorobanTransactionData.resourceFee().toString()
+  // console.log(resources.footprint().readOnly());
+  // console.log(resources.footprint().readWrite())
+  // console.log(resources.footprint())
+
+  const stroopValue = sorobanTransactionData.resourceFee().toString();
+  // console.log(sorobanTransactionData.resourceFee())
+
   const xlmValue = Number(stroopValue) * 10**(-7);
 
   const rwro = [
@@ -45,14 +54,18 @@ function sorobill(sim, tx_xdr) {
       cpu_insn: Number(sim.result.cost.cpuInsns)
   };
 
-
+ 
   const stats = {
+      // The maximum number of instructions this transaction can use
       cpu_insns: metrics.cpu_insn,
+      
       mem_bytes: metrics.mem_byte,
       entry_reads: resources.footprint().readOnly().length,
       entry_writes: resources.footprint().readWrite().length,
+      // The maximum number of bytes this transaction can read from ledger
       read_bytes: resources.readBytes(),
       // NOTE This covers both `contractDataEntrySizeBytes` in the case of a contract invocation and `contractMaxSizeBytes` in the case of a WASM install
+      // The maximum number of bytes this transaction can write to ledger
       write_bytes: resources.writeBytes(),
       events_and_return_bytes,
       /* NOTE
@@ -68,6 +81,7 @@ function sorobill(sim, tx_xdr) {
           If you're submitting a wasm upload up the max value is likely the wasm binary size
       */
       max_key_bytes: Math.max(...rwro),
+      // max_entry_bytes: tx ? entries?.length ? Math.max(...entries) : 0 : undefined,
       resource_fee_in_xlm: xlmValue,
   };
 
@@ -85,8 +99,9 @@ const transaction = new StellarSDK.TransactionBuilder(sourceAccount, { fee: Stel
   .setTimeout(30)
   .build();
 
-const tx_xdr = transaction.toEnvelope().toXDR('base64');
+// const tx_xdr = transaction.toEnvelope().toXDR('base64');
 
+const tx_xdr = "AAAAAgAAAACWDRNrgN4HpWfA2B7H3QSMtt7GSK/J3/cH+i/Waf406QExLQAAAAL7AABAZwAAAAEAAAAAAAAAAAAAAABmtQMYAAAAAAAAAAEAAAABAAAAAJYNE2uA3gelZ8DYHsfdBIy23sZIr8nf9wf6L9Zp/jTpAAAAGAAAAAAAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJc2V0X3ByaWNlAAAAAAAAAgAAABAAAAABAAAABwAAAAoAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAEBrNWXoAAAAKAAAAAAAAAAAAAFsFmk6VOQAAAAoAAAAAAAAAAAAABC7JTh37AAAACgAAAAAAAAAAAAAAVjr7wbwAAAAKAAAAAAAAAAAAAAARbJhDMgAAAAoAAAAAAAAAAAAAYgjQpjcUAAAABQAAAZEzE3mAAAAAAQAAAAAAAAAAAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACXNldF9wcmljZQAAAAAAAAIAAAAQAAAAAQAAAAcAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAABAazVl6AAAACgAAAAAAAAAAAABbBZpOlTkAAAAKAAAAAAAAAAAAAAQuyU4d+wAAAAoAAAAAAAAAAAAAAFY6+8G8AAAACgAAAAAAAAAAAAAAEWyYQzIAAAAKAAAAAAAAAAAAAGII0KY3FAAAAAUAAAGRMxN5gAAAAAAAAAABAAAAAAAAAAEAAAAH34iCDiMa2PMCeHHl3Tz0VJHXt3NeeFcxRmv8KUYAhggAAAAHAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAAAkAAAGRMxN5gAAAAAAAAAABAAAAAAAAAAYAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJAAABkTMTeYAAAAAAAAAAAgAAAAAAAAAGAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACQAAAZEzE3mAAAAAAAAAAAMAAAAAAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAAAkAAAGRMxN5gAAAAAAAAAAEAAAAAAAAAAYAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJAAABkTMTeYAAAAAAAAAABQAAAAAAAAAGAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACQAAAZEzE3mAAAAAAAAAAAYAAAAAAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAABQAAAABAIlUQAAAnEAAAAu4AAAAAACYloAAAAABzKXZYAAAAEACmqRBpXbFU8qKDK5RblnLKbH5D5r0y1D8YdbuwHxFfP8cjzI7MqatezfTpaVCOxgjCINZk0JMk5bZjdHG6iAM"
 // console.log(tx_xdr);
 
 let requestBody = {
@@ -96,12 +111,12 @@ let requestBody = {
   "params": {
     "transaction": tx_xdr,
     "resourceConfig": {
-      "instructionLeeway": 3000000
+      "instructionLeeway": 0
     }
   }
 }
 
-let res = await fetch("https://soroban-testnet.stellar.org:443", {
+let res = await fetch("https://soroban-testnet.stellar.org", {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

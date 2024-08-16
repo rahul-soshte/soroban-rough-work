@@ -493,7 +493,8 @@ fn rent_fee_for_size_and_ledgers(
         fee_config.temporary_rent_rate_denominator
     };
 
-    //? Again num_integer, is the best library they got, wut
+    // Again num_integer, is the best library they got, wut
+    // yes with 192,606,417 downloads as of 16the August 2024, it makes sense
     let denom = DATA_SIZE_1KB_INCREMENT.saturating_mul(storage_coef);
     num_integer::div_ceil(num, denom.max(1))
 }
@@ -502,6 +503,5 @@ fn rent_fee_for_size_and_ledgers(
 fn compute_fee_per_increment(resource_value: u32, fee_rate: i64, increment: i64) -> i64 {
     //? Okay they are using i64 for the resource values
     let resource_val: i64 = resource_value.into();
-    //? num_integer, is this some core library i dont know about
     num_integer::div_ceil(resource_val.saturating_mul(fee_rate), increment.max(1))
 }

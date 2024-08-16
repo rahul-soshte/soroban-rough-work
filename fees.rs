@@ -12,7 +12,7 @@
 /// (independent of the transaction envelope size).
 
 // Size of the transaction result
-//? Is the result of a transaction stored in the blockchain
+// Yes the result of a transaction stored in the blockchain
 pub const TX_BASE_RESULT_SIZE: u32 = 300;
 
 /// Estimate for any `TtlEntry` ledger entry
@@ -40,7 +40,7 @@ pub struct TransactionResources {
     pub read_entries: u32,
     /// Number of ledger entries the transaction writes (these are also counted
     /// as entries that are being read for the sake of the respective fees).
-    /// Hmm, so okay, the ledgers that are written are also counted as 
+    /// Hmm, so okay, the ledgers that are written are also counted as read 
     pub write_entries: u32,
     /// Number of bytes read from ledger.
     /// Okay
@@ -166,7 +166,12 @@ pub struct RentFeeConfiguration {
     /// Denominator for the total rent fee for temporary storage.
     ///
     /// This has the same semantics as `persistent_rent_rate_denominator`
-    //? Where is instance
+    
+    // Where is instance
+    // While we are making a distinction here between "persistent" and "instance" storage, 
+    // instance storage is really just a convenient, abstracted type of persistent storage. 
+    // Under the hood, the instance storage works the same as persistent storage,
+    // except its own TTL is tied to that of the contract instance
     pub temporary_rent_rate_denominator: i64,
 }
 
@@ -190,7 +195,8 @@ pub fn compute_transaction_resource_fee(
         INSTRUCTIONS_INCREMENT,
     );
 
-    //? Okay
+    // Okay got it, write entries are added with the read entries to calculate the 
+    // total 
     let ledger_read_entry_fee: i64 = fee_config.fee_per_read_entry.saturating_mul(
         tx_resources
             .read_entries
@@ -198,7 +204,7 @@ pub fn compute_transaction_resource_fee(
             .into(),
     );
     
-    //? get the concept distilled
+    // got the concept distilled
     let ledger_write_entry_fee = fee_config
         .fee_per_write_entry
         .saturating_mul(tx_resources.write_entries.into());
@@ -233,6 +239,9 @@ pub fn compute_transaction_resource_fee(
     );
 
     //? Need to understand concept
+    // Bandwidth It's the size of the TransactionEnvelope, 
+    // and includes the signatures.
+    // I agree it's a little complex to calculate the exact non-refundable resource fee.
     let bandwidth_fee = compute_fee_per_increment(
         tx_resources.transaction_size_bytes,
         fee_config.fee_per_transaction_size_1kb,

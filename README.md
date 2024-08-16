@@ -15,3 +15,7 @@ mercury-cli --jwt $MERCURY_JWT --local false --mainnet false deploy
 mercury-cli --jwt $MERCURY_JWT --local false --mainnet true deploy
 ```
 
+## Invoking hello world from CLI
+```bash
+soroban contract invoke --id CD4BKH6OMPUSOCJHDDJVN2UD5OOHJYQHTAHU2KXPT4EFSQYXLYGG3D2V --network testnet --source SB66VLFNPAMBIAS5FLPY5NEKALZA64INYELFYEGPT53UI7S6ORPMSLK5 --cost -- hello --arg "World"
+```

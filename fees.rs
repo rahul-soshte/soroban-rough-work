@@ -25,7 +25,7 @@ pub const TTL_ENTRY_SIZE: u32 = 48;
 // It is just making the resource to its corresponding fee value standardized
 const INSTRUCTIONS_INCREMENT: i64 = 10000;
 
-//? What sort of data is considered DATA
+// What sort of data is considered DATA, mentioned in the doc
 const DATA_SIZE_1KB_INCREMENT: i64 = 1024;
 
 // minimum effective write fee per 1KB
@@ -50,7 +50,7 @@ pub struct TransactionResources {
     /// Okay
     pub read_bytes: u32,
     /// Number of bytes written to ledger.
-    //? Are the bytes written also counted as bytes read
+    // Are the bytes written also counted as bytes read, no where mentioned that explicitly
     pub write_bytes: u32,
     /// Size of the contract events XDR.
     //? Okay, Where do I get this XDR exactly
@@ -88,7 +88,7 @@ pub struct FeeConfiguration {
     /// Fee per 1KB written to history (the history write size is based on
     /// transaction size and `TX_BASE_RESULT_SIZE`).
     /// Okay
-    //? What does historical fee mean exactly
+    // What does historical fee mean exactly, transaction storage cost in the ledger.
     pub fee_per_historical_1kb: i64,
     /// Fee per 1KB of contract events written.
     //? Where are these contract events located, and how to find their size
@@ -227,7 +227,7 @@ pub fn compute_transaction_resource_fee(
         DATA_SIZE_1KB_INCREMENT,
     );
 
-    //? What does historical fee mean exactly
+    //* the cost of storing the txn on the network
     let historical_fee = compute_fee_per_increment(
         tx_resources
             .transaction_size_bytes
@@ -412,7 +412,7 @@ impl LedgerEntryRentChange {
         self.old_size_bytes == 0 && self.old_live_until_ledger == 0
     }
 
-    //? This must be the TTL
+    // This must be the TTL, yes it is, calculation of how much ledgers got extended
     fn extension_ledgers(&self, current_ledger: u32) -> Option<u32> {
         let ledger_before_extension = if self.entry_is_new() {
             current_ledger.saturating_sub(1)
@@ -422,7 +422,10 @@ impl LedgerEntryRentChange {
         exclusive_ledger_diff(ledger_before_extension, self.new_live_until_ledger)
     }
 
-    //? What is prepaid ledgers, huh
+    // What is prepaid ledgers, huh
+    // at ledger 0, someone paid for ttl till ledger 10000,
+    // at ledger 5000, the remaining TTL 10000 - 5000 is considered to be 
+    // prepaid
     fn prepaid_ledgers(&self, current_ledger: u32) -> Option<u32> {
         if self.entry_is_new() {
             None
@@ -437,7 +440,7 @@ impl LedgerEntryRentChange {
     }
 }
 
-//? Uhh okay this is for individual entries yes.
+//* okay this is for individual entries yes.
 fn rent_fee_per_entry_change(
     entry_change: &LedgerEntryRentChange,
     fee_config: &RentFeeConfiguration,
@@ -459,7 +462,6 @@ fn rent_fee_per_entry_change(
     // If there were some ledgers already paid for at an old size, and the size
     // of the entry increased, those pre-paid ledgers need to pay top-up fees to
     // account for the change in size.
-    //? How to prepay a ledger exactly
     if let (Some(rent_ledgers), Some(entry_size)) = (
         entry_change.prepaid_ledgers(current_ledger),
         entry_change.size_increase(),

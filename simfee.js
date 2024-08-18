@@ -111,7 +111,7 @@ let requestBody = {
   "params": {
     "transaction": tx_xdr,
     "resourceConfig": {
-      "instructionLeeway": 0
+      "instructionLeeway": 3000000
     }
   }
 }

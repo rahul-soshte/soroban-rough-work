@@ -16,10 +16,13 @@
 pub const TX_BASE_RESULT_SIZE: u32 = 300;
 
 /// Estimate for any `TtlEntry` ledger entry
-//? TTL is time to live
+//* TTL is time to live, i.e the ledger at whcih the ledger entry will be archived.
+// I mean the data for the time to live must be stored somewhere, I mean
+// So for every 
 pub const TTL_ENTRY_SIZE: u32 = 48;
 
-//? Increment, what is meant by increment
+//* */ Increment, what is meant by increment
+// It is just making the resource to its corresponding fee value standardized
 const INSTRUCTIONS_INCREMENT: i64 = 10000;
 
 //? What sort of data is considered DATA
@@ -27,7 +30,8 @@ const DATA_SIZE_1KB_INCREMENT: i64 = 1024;
 
 // minimum effective write fee per 1KB
 // Okay the minimum write fee to write 1KB into a ledger
-//? How is the maximum fee calculated then
+//* How is the maximum fee calculated then, the usual way in compute_write_fee_per_1kb
+// if the calculated write fee is less than 1000, it will still be charged 1000 stroops
 pub const MINIMUM_WRITE_FEE_PER_1KB: i64 = 1000;
 
 /// These are the resource upper bounds specified by the Soroban transaction.
@@ -65,8 +69,8 @@ pub struct TransactionResources {
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct FeeConfiguration {
     /// Fee per `INSTRUCTIONS_INCREMENT=10000` instructions.
-    //? For every 10000 instructions, hmm, what if there 50 instruction would that be same as 10000 or 
-    //? What if it goes 10001, what happens then 
+    //* For every 10000 instructions, hmm, what if there 50 instruction would that be same as 10000 or 
+    //* What if it goes 10001, what happens then it be fee_per_increment
     pub fee_per_instruction_increment: i64,
     /// Fee per 1 entry read from ledger.
     // Okay 
@@ -188,7 +192,7 @@ pub fn compute_transaction_resource_fee(
     tx_resources: &TransactionResources,
     fee_config: &FeeConfiguration,
 ) -> (i64, i64) {
-    //? Compute Fee Per Increment at the bottom
+    // Compute Fee Per Increment at the bottom, yes its a common confusing function but yest at the bottom
     let compute_fee = compute_fee_per_increment(
         tx_resources.instructions,
         fee_config.fee_per_instruction_increment,
@@ -209,14 +213,14 @@ pub fn compute_transaction_resource_fee(
         .fee_per_write_entry
         .saturating_mul(tx_resources.write_entries.into());
     
-    //? Get the concept distilled
+    //* Data read from Ledger
     let ledger_read_bytes_fee = compute_fee_per_increment(
         tx_resources.read_bytes,
         fee_config.fee_per_read_1kb,
         DATA_SIZE_1KB_INCREMENT,
     );
 
-    //? write
+    //* Data written to a ledger
     let ledger_write_bytes_fee = compute_fee_per_increment(
         tx_resources.write_bytes,
         fee_config.fee_per_write_1kb,
@@ -238,10 +242,10 @@ pub fn compute_transaction_resource_fee(
         DATA_SIZE_1KB_INCREMENT,
     );
 
-    //? Need to understand concept
-    // Bandwidth It's the size of the TransactionEnvelope, 
+    // For Bandwidth, It's the size of the TransactionEnvelope, 
     // and includes the signatures.
     // I agree it's a little complex to calculate the exact non-refundable resource fee.
+    // transaction size is charged for network propagation (as network bandwidth is limited) 
     let bandwidth_fee = compute_fee_per_increment(
         tx_resources.transaction_size_bytes,
         fee_config.fee_per_transaction_size_1kb,
@@ -480,13 +484,17 @@ fn rent_fee_for_size_and_ledgers(
     // Multiplication can overflow here - unlike fee computation this can rely
     // on sane input parameters as rent fee computation does not depend on any
     // user inputs.
-    //? saturating_mul probably provides protection from overflow
+
+
+    // unlike regular multiplication, saturating_mul ensures that if the multiplication 
+    // would result in a value that exceeds the maximum or minimum value that the type can hold,
+    // it will "saturate" at that value instead of overflowing.
     let num = (entry_size as i64)
         .saturating_mul(fee_config.fee_per_write_1kb)
         .saturating_mul(rent_ledgers as i64);
     
-    //? Some sort of coefficient for Persistent and Temporary Entries
-    //? How are these coefficients exactly together
+    // this is defined in the soroban-setting from the stellar-core repo
+    // https://github.com/stellar/stellar-core/blob/55ec348409407ec7def75cae60ae1b520bef4adc/soroban-settings/testnet_settings.json#L516
     let storage_coef = if is_persistent {
         fee_config.persistent_rent_rate_denominator
     } else {
@@ -499,9 +507,11 @@ fn rent_fee_for_size_and_ledgers(
     num_integer::div_ceil(num, denom.max(1))
 }
 
-//? What is Compute Fee Per Increment, mean exactly, 
+// What is Compute Fee Per Increment, mean exactly, 
+// Multiplies the resource value by the fee rate, and then divides by stipulated
+// So its very simple 4th grade formula lmao
+// If x corresponds y, then a corresponds to what, which means b = (a * y) / x  
 fn compute_fee_per_increment(resource_value: u32, fee_rate: i64, increment: i64) -> i64 {
-    //? Okay they are using i64 for the resource values
     let resource_val: i64 = resource_value.into();
     num_integer::div_ceil(resource_val.saturating_mul(fee_rate), increment.max(1))
 }

@@ -33,7 +33,7 @@ function computeReadBytesFee(bytesRead) {
 }
 
 function computeWriteBytesFee(instructions) {
-    const FEE_RATE = 11800;
+    const FEE_RATE = 11800; // Approx
     const DIVISOR = 1024;
     const instructionsNum = Number(instructions);
     const fee = (instructionsNum * FEE_RATE) / DIVISOR;
@@ -250,7 +250,7 @@ function computeRentFee(changedEntries, currentLedgerSeq) {
 }
 
 const feeConfig = new RentFeeConfiguration(
-    11800,  // feePerWrite1kb (11,800 stroops per 1KB written)
+    11800,  // feePerWrite1kb (Approx 11,800 stroops per 1KB written)
     10000,  // feePerWriteEntry (10,000 stroops per entry written)
     2103,   // persistentRentRateDenominator
     4206    // temporaryRentRateDenominator

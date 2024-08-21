@@ -10,8 +10,8 @@ const contract = new StellarSDK.Contract(contractId);
 function sorobill(sim, tx_xdr) {
   
   const events = sim.result.events.map((e) => {
-    const buffer = Buffer.from(e, 'base64');
-    let parsedEvent = StellarSDK.xdr.DiagnosticEvent.fromXDR(buffer);
+    const buffer_val = Buffer.from(e, 'base64');
+    let parsedEvent = StellarSDK.xdr.DiagnosticEvent.fromXDR(buffer_val);
   
     if (parsedEvent.event().type().name !== 'contract')
           return 0;
@@ -28,17 +28,8 @@ function sorobill(sim, tx_xdr) {
 
 
   const sorobanTransactionData = StellarSDK.xdr.SorobanTransactionData.fromXDR(sim.result.transactionData, 'base64');
-  
-  console.log(sorobanTransactionData);
-  
   const resources = sorobanTransactionData.resources();
-
-  // console.log(resources.footprint().readOnly());
-  // console.log(resources.footprint().readWrite())
-  // console.log(resources.footprint())
-
   const stroopValue = sorobanTransactionData.resourceFee().toString();
-  // console.log(sorobanTransactionData.resourceFee())
 
   const xlmValue = Number(stroopValue) * 10**(-7);
 
@@ -60,7 +51,7 @@ function sorobill(sim, tx_xdr) {
       cpu_insns: metrics.cpu_insn,
       
       mem_bytes: metrics.mem_byte,
-      entry_reads: resources.footprint().readOnly().length,
+      entry_reads: resources.footprint().readOnly().length + resources.footprint().readWrite().length,
       entry_writes: resources.footprint().readWrite().length,
       // The maximum number of bytes this transaction can read from ledger
       read_bytes: resources.readBytes(),
@@ -102,7 +93,6 @@ const transaction = new StellarSDK.TransactionBuilder(sourceAccount, { fee: Stel
 // const tx_xdr = transaction.toEnvelope().toXDR('base64');
 
 const tx_xdr = "AAAAAgAAAACWDRNrgN4HpWfA2B7H3QSMtt7GSK/J3/cH+i/Waf406QExLQAAAAL7AABAZwAAAAEAAAAAAAAAAAAAAABmtQMYAAAAAAAAAAEAAAABAAAAAJYNE2uA3gelZ8DYHsfdBIy23sZIr8nf9wf6L9Zp/jTpAAAAGAAAAAAAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJc2V0X3ByaWNlAAAAAAAAAgAAABAAAAABAAAABwAAAAoAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAEBrNWXoAAAAKAAAAAAAAAAAAAFsFmk6VOQAAAAoAAAAAAAAAAAAABC7JTh37AAAACgAAAAAAAAAAAAAAVjr7wbwAAAAKAAAAAAAAAAAAAAARbJhDMgAAAAoAAAAAAAAAAAAAYgjQpjcUAAAABQAAAZEzE3mAAAAAAQAAAAAAAAAAAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACXNldF9wcmljZQAAAAAAAAIAAAAQAAAAAQAAAAcAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAABAazVl6AAAACgAAAAAAAAAAAABbBZpOlTkAAAAKAAAAAAAAAAAAAAQuyU4d+wAAAAoAAAAAAAAAAAAAAFY6+8G8AAAACgAAAAAAAAAAAAAAEWyYQzIAAAAKAAAAAAAAAAAAAGII0KY3FAAAAAUAAAGRMxN5gAAAAAAAAAABAAAAAAAAAAEAAAAH34iCDiMa2PMCeHHl3Tz0VJHXt3NeeFcxRmv8KUYAhggAAAAHAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAAAkAAAGRMxN5gAAAAAAAAAABAAAAAAAAAAYAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJAAABkTMTeYAAAAAAAAAAAgAAAAAAAAAGAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACQAAAZEzE3mAAAAAAAAAAAMAAAAAAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAAAkAAAGRMxN5gAAAAAAAAAAEAAAAAAAAAAYAAAABKrf0Z9GS/LKu+hOOCq4fWWIWaS1ePWMaLC7oHiY6uD8AAAAJAAABkTMTeYAAAAAAAAAABQAAAAAAAAAGAAAAASq39GfRkvyyrvoTjgquH1liFmktXj1jGiwu6B4mOrg/AAAACQAAAZEzE3mAAAAAAAAAAAYAAAAAAAAABgAAAAEqt/Rn0ZL8sq76E44Krh9ZYhZpLV49YxosLugeJjq4PwAAABQAAAABAIlUQAAAnEAAAAu4AAAAAACYloAAAAABzKXZYAAAAEACmqRBpXbFU8qKDK5RblnLKbH5D5r0y1D8YdbuwHxFfP8cjzI7MqatezfTpaVCOxgjCINZk0JMk5bZjdHG6iAM"
-// console.log(tx_xdr);
 
 let requestBody = {
   "jsonrpc": "2.0",

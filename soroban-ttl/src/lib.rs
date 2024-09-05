@@ -12,34 +12,43 @@ pub enum DataKey {
 #[contract]
 pub struct TtlContract;
 
+
+pub(crate) const DAY_IN_LEDGERS: u32 = 17280;
+
+pub(crate) const SHARED_BUMP_AMOUNT: u32 = 31 * DAY_IN_LEDGERS;
+pub(crate) const SHARED_LIFETIME_THRESHOLD: u32 = SHARED_BUMP_AMOUNT - DAY_IN_LEDGERS;
+
 #[contractimpl]
 impl TtlContract {
     /// Creates a contract entry in every kind of storage.
     pub fn setup(env: Env) {
-        env.storage().persistent().set(&DataKey::MyKey, &0);
-        env.storage().instance().set(&DataKey::MyKey, &1);
+        // env.storage().persistent().set(&DataKey::MyKey, &0);
+        // env.storage().instance().set(&DataKey::MyKey, &1);
         env.storage().temporary().set(&DataKey::MyKey, &2);
     }
 
-    /// Extend the persistent entry TTL to 5000 ledgers, when its
-    /// TTL is smaller than 1000 ledgers.
-    pub fn extend_persistent(env: Env) {
-        env.storage()
-            .persistent()
-            .extend_ttl(&DataKey::MyKey, 1000, 5000);
-    }
+
+    // /// Extend the persistent entry TTL to 5000 ledgers, when its
+    // /// TTL is smaller than 1000 ledgers.
+    // pub fn extend_persistent(env: Env) {
+    //     env.storage()
+    //         .persistent()
+    //         .extend_ttl(&DataKey::MyKey, 1000, 5000);
+    // }
 
     /// Extend the instance entry TTL to become at least 10000 ledgers,
     /// when its TTL is smaller than 2000 ledgers.
-    pub fn extend_instance(env: Env) {
-        env.storage().instance().extend_ttl(2000, 10000);
-    }
+    // pub fn extend_instance(env: Env) {
+        // env.storage().instance().extend_ttl(2000, 10000);
+    // }
 
     /// Extend the temporary entry TTL to become at least 7000 ledgers,
     /// when its TTL is smaller than 3000 ledgers.
     pub fn extend_temporary(env: Env) {
         env.storage()
             .temporary()
-            .extend_ttl(&DataKey::MyKey, 3000, 7000);
+            .extend_ttl(&DataKey::MyKey, SHARED_LIFETIME_THRESHOLD, SHARED_BUMP_AMOUNT);
     }
+
+    
 }

@@ -27,8 +27,8 @@ async function getTransactionXDR(transactionHash) {
 }
 
 // Usage example
-// const transactionHash = '3ef793ad7653c371e590cba4b1ab823eaf1b7aed60fab2295b27dd550cd9d922';
-const transactionHash = '707e23a64928f205e8660a425ce1e97d77be456e388aa68c7e7f10abc1630b73';
+// const transactionHash = 'cbb496a8f2a63492a8f1f5e7e521e6a48f4397459a7ab9060a88f1ff93e21365';
+const transactionHash = '3ef793ad7653c371e590cba4b1ab823eaf1b7aed60fab2295b27dd550cd9d922';
 
 getTransactionXDR(transactionHash)
   .then(xdrData => {

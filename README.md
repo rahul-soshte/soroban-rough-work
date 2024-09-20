@@ -23,10 +23,10 @@ soroban contract invoke --id CD4BKH6OMPUSOCJHDDJVN2UD5OOHJYQHTAHU2KXPT4EFSQYXLYG
 
 ## Deploying TTL Example
 ```bash
-soroban contract deploy   --wasm target/wasm32-unknown-unknown/release/soroban_ttl_example.wasm   --source SDSANP4BT2J5IF75H53436J5A3YJ6RCX24EE5SRFUWU3SBZGXHWTWXJO   --network testnet
+soroban contract deploy   --wasm target/wasm32-unknown-unknown/release/soroban_ttl_example.wasm   --source SD4QOBGVANZWLGNXXCQUNOETLUI5WNABANY3VDCEGGJ6MZMYZQXQGGRH   --network testnet
 ```
 
 ## Invoking setup function
 ```bash
-soroban contract invoke --id CDWO6ZVBTOANE64NMAQ3FZKULMOGFJHXSLIRNCCADVLF4NMLNDNGSELL --network testnet --source SDSANP4BT2J5IF75H53436J5A3YJ6RCX24EE5SRFUWU3SBZGXHWTWXJO --cost -- setup
+soroban contract invoke --id CCRCQUZMKESHHSLSONSKNW26D43V4CLLKRME6J6PHKR3MSDLQVRIRE4X --network testnet --source SD4QOBGVANZWLGNXXCQUNOETLUI5WNABANY3VDCEGGJ6MZMYZQXQGGRH --cost -- setup
 ```

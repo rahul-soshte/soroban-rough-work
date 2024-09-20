@@ -33,7 +33,7 @@ function computeReadBytesFee(bytesRead) {
 }
 
 function computeWriteBytesFee(instructions) {
-    const FEE_RATE = 11800; // Approx
+    const FEE_RATE = 9836; // Approx
     const DIVISOR = 1024;
     const instructionsNum = Number(instructions);
     const fee = (instructionsNum * FEE_RATE) / DIVISOR;
@@ -155,7 +155,7 @@ function rentFeeForSizeAndLedgers(isPersistent, entrySize, rentLedgers) {
     
     // Use BigInt for all calculations to avoid overflow
     const num = BigInt(entrySize) *
-                BigInt(11800) *
+                BigInt(9836) *
                 BigInt(rentLedgers);
     
     const storageCoef = isPersistent
@@ -244,13 +244,13 @@ function computeRentFee(changedEntries, currentLedgerSeq) {
     }
 
     fee += BigInt(10000) * extendedEntries;
-    //(Math.ceil((extendedEntryKeySizeBytes * 11800 ) / 1024))
-    fee = fee + ceilN(BigInt(extendedEntryKeySizeBytes) * BigInt(11800), BigInt(1024) )            
+    //(Math.ceil((extendedEntryKeySizeBytes * 9836 ) / 1024))
+    fee = fee + ceilN(BigInt(extendedEntryKeySizeBytes) * BigInt(9836), BigInt(1024) )            
     return fee;
 }
 
 const feeConfig = new RentFeeConfiguration(
-    11800,  // feePerWrite1kb (Approx 11,800 stroops per 1KB written)
+    9836,  // feePerWrite1kb (Approx 11,800 stroops per 1KB written)
     10000,  // feePerWriteEntry (10,000 stroops per entry written)
     2103,   // persistentRentRateDenominator
     4206    // temporaryRentRateDenominator

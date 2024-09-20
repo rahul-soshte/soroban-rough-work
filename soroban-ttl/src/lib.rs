@@ -22,9 +22,9 @@ pub(crate) const SHARED_LIFETIME_THRESHOLD: u32 = SHARED_BUMP_AMOUNT - DAY_IN_LE
 impl TtlContract {
     /// Creates a contract entry in every kind of storage.
     pub fn setup(env: Env) {
-        // env.storage().persistent().set(&DataKey::MyKey, &0);
+        env.storage().persistent().set(&DataKey::MyKey, &0);
         // env.storage().instance().set(&DataKey::MyKey, &1);
-        env.storage().temporary().set(&DataKey::MyKey, &2);
+        // env.storage().temporary().set(&DataKey::MyKey, &2);
     }
 
 

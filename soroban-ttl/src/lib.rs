@@ -27,6 +27,12 @@ impl TtlContract {
         // env.storage().temporary().set(&DataKey::MyKey, &2);
     }
 
+    pub fn test1() {
+        let _a = "onelove";
+        // env.storage().instance().set(&DataKey::MyKey, &1);
+        // env.storage().temporary().set(&DataKey::MyKey, &2);
+    }
+
 
     // /// Extend the persistent entry TTL to 5000 ledgers, when its
     // /// TTL is smaller than 1000 ledgers.

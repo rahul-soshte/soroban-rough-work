@@ -1,0 +1,7 @@
+[package]
+name = "p22-txmeta-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+stellar-xdr =  { version = "22.0.0", default-features = true, features = ["base64", "std", "next"] }

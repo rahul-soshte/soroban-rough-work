@@ -28,10 +28,15 @@ soroban contract deploy   --wasm target/wasm32-unknown-unknown/release/soroban_t
 
 ## Deploying Increment Example
 ```bash
-soroban contract deploy   --wasm target/wasm32-unknown-unknown/release/soroban_increment_contract.wasm  --source SDTJQOTJLSVZSVTDX2OU4C7PC6CORXEZ3S65QWEMAHEXCMIHKNW6FCPP   --network testnet
+stellar contract deploy   --wasm target/wasm32-unknown-unknown/release/soroban_increment_contract.wasm  --source SBQ2476EDDHYVYPCVRLSOL2XPHF3ALPZ7LN36J54D7CZKNBVZOPO32LP   --network testnet
 ```
 
 ## Invoking setup function
 ```bash
 soroban contract invoke --id CCRCQUZMKESHHSLSONSKNW26D43V4CLLKRME6J6PHKR3MSDLQVRIRE4X --network testnet --source SD4QOBGVANZWLGNXXCQUNOETLUI5WNABANY3VDCEGGJ6MZMYZQXQGGRH --cost -- setup
+```
+
+## Invoking increment function
+```bash
+stellar contract invoke --id CCSE2AN2S4RLMMXJY5FRYQ4YN6UGG54LJT3HPWGGISMJI4OAUYOY6AVR --network testnet --source SBUZCKI2CUYAG7DYCLBDQ4BBBL2VJJ5OM6S6QUIVDQPU7CQOJDCUBUQ3 --cost -- increment
 ```
